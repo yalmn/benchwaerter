@@ -1,17 +1,24 @@
-package org.example;
+package org.example.benchmark;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.results.format.ResultFormatType;
+
+/**
+ * Haupt-Klasse zum Ausführen der Benchmarks per JMH und Erzeugen einer JSON-Ausgabe.
+ */
 public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
-
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+    public static void main(String[] args) throws Exception {
+        Options opt = new OptionsBuilder()
+                .include(AlgorithmBenchmark.class.getSimpleName())
+                .forks(1)
+                .warmupIterations(3)
+                .measurementIterations(5)
+                .result("benchmark-results.json")
+                .resultFormat(ResultFormatType.JSON)
+                .build();
+        new Runner(opt).run();
+        System.out.println("Benchmark beendet. Ergebnisse in benchmark-results.json");
     }
 }

@@ -138,4 +138,4 @@ Falls du Schritt für Schritt vorgehen möchtest:
 
 ## Lizenz
 
-MIT License © DEIN_NAME
+MIT License © yalmn
