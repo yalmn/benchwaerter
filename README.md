@@ -65,7 +65,7 @@ benchwaerter/
 ### 1. Klonen des Repositories
 
 ```bash
-git clone https://github.com/DEIN_USERNAME/benchwaerter.git
+git clone https://github.com/yalmn/benchwaerter.git
 cd benchwaerter
 ```
 
