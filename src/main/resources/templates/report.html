@@ -11,12 +11,27 @@
         caption { caption-side: top; font-size: 1.5rem; margin-bottom: 1rem; }
         .metadata { margin-bottom: 1rem; font-size: 0.9rem; }
         .metadata span { display: inline-block; margin-right: 1.5rem; }
-        .legend { font-size: 0.9rem; }
-        .legend dt { font-weight: bold; }
+
+        .legend {
+            font-size: 0.95rem;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 1rem;
+            border-radius: 5px;
+        }
+        .legend dt {
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+        .legend dd {
+            margin-left: 1rem;
+            margin-bottom: 0.5rem;
+        }
     </style>
 </head>
 <body>
 <h1>Benchmark-Report</h1>
+
 <div class="metadata">
     <span>Erstellt am: <strong th:text="${timestamp}"></strong></span>
     <span>Architektur: <strong th:text="${architecture}"></strong></span>
@@ -41,12 +56,12 @@
     <tr th:each="res : ${results}">
         <td th:text="${res.name}"></td>
         <td th:text="${res.bitSize}"></td>
-        <td th:text="${#numbers.formatDecimal(res.score, 0, 2)}"></td>
-        <td th:text="${#numbers.formatDecimal(res.scoreError, 0, 2)}"></td>
-        <td th:text="${#numbers.formatDecimal(res.opsPerMs, 0, 4)}"></td>
-        <td th:text="${#numbers.formatDecimal(res.latencyUs, 0, 2)}"></td>
-        <td th:text="${res.heapMb}"></td>
-        <td th:text="${res.cpuLoad}"></td>
+        <td th:text="${#numbers.formatDecimal(res.score, 1, 4).replace('.', ',')}"></td>
+        <td th:text="${#numbers.formatDecimal(res.scoreError, 1, 4).replace('.', ',')}"></td>
+        <td th:text="${#numbers.formatDecimal(res.opsPerMs, 1, 4).replace('.', ',')}"></td>
+        <td th:text="${#numbers.formatDecimal(res.latencyUs, 1, 4).replace('.', ',')}"></td>
+        <td th:text="${#numbers.formatDecimal(res.heapMb, 1, 4).replace('.', ',')}"></td>
+        <td th:text="${#numbers.formatDecimal(res.cpuLoad, 1, 4).replace('.', ',')}"></td>
     </tr>
     </tbody>
 </table>
@@ -55,11 +70,11 @@
     <h2>Legende</h2>
     <dl>
         <dt>Bit-Größe</dt>
-        <dd>Anzahl der Bits der Eingabe-Zahlen (z. B. 256, 512, 1024).</dd>
+        <dd>Anzahl der Bits der Eingabe-Zahlen (z. B. 256, 512, 1024).</dd>
         <dt>Durchsatz (ops/s)</dt>
         <dd>Anzahl der durchgeführten Operationen pro Sekunde.</dd>
         <dt>Fehler (± ops/s)</dt>
-        <dd>Standardfehler des Durchsatzes (95 % Konfidenzintervall).</dd>
+        <dd>Standardfehler des Durchsatzes (95 % Konfidenzintervall).</dd>
         <dt>Operationen pro ms</dt>
         <dd>Durchsatz umgerechnet auf Operationen pro Millisekunde.</dd>
         <dt>Latenz pro Op (µs)</dt>
@@ -70,5 +85,6 @@
         <dd>Zunahme der Prozessorauslastung pro Operation in Prozentpunkten.</dd>
     </dl>
 </section>
+
 </body>
 </html>
