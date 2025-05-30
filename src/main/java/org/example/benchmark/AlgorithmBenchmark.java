@@ -16,9 +16,6 @@ import java.security.SecureRandom;
 @State(Scope.Benchmark)
 public class AlgorithmBenchmark {
 
-    /**
-     * Hilfsklasse für sekundäre Kennzahlen (Heap und CPU).
-     */
     @AuxCounters(AuxCounters.Type.EVENTS)
     @State(Scope.Thread)
     public static class Counters {
@@ -75,10 +72,10 @@ public class AlgorithmBenchmark {
                 result = new ExtendedEuclideanAlgorithm().execute(a, b);
                 break;
             case "MillerRabin":
-                result = new MillerRabin().execute(a); // a ist hier n
+                result = new MillerRabin().execute(a);
                 break;
             case "FastAdd":
-                result = new FastAdd().execute(a, b, BigInteger.valueOf(100), mod); // x, y, k=100, mod
+                result = new FastAdd().execute(a, b, BigInteger.valueOf(100), mod);
                 break;
             case "SumOfTwoSquares":
             case "ComputeOrderOfEllipticCurve":
