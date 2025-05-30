@@ -1,7 +1,7 @@
 package org.example.benchmark;
 
-import org.example.algorithmen.FastExponential;
-import org.example.algorithmen.EuclideanAlgorithm;
+import org.example.algorithmen.*;
+
 import org.openjdk.jmh.annotations.*;
 
 import java.lang.management.ManagementFactory;
@@ -10,15 +10,12 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 /**
- * JMH-Benchmark-Klasse für die ALgoirthmen.
+ * JMH-Benchmark-Klasse für die Algorithmen.
  * Misst Performance, Heap-Verbrauch und CPU-Auslastung für verschiedene Bit-Längen.
  */
 @State(Scope.Benchmark)
 public class AlgorithmBenchmark {
 
-    /**
-     * Hilfsklasse für sekundäre Kennzahlen (Heap und CPU).
-     */
     @AuxCounters(AuxCounters.Type.EVENTS)
     @State(Scope.Thread)
     public static class Counters {
@@ -28,10 +25,19 @@ public class AlgorithmBenchmark {
         public double cpuLoad;
     }
 
-    @Param({"FastExponential", "EuclideanAlgorithm"})
+    @Param({
+            "FastExponential",
+            "EuclideanAlgorithm",
+            "MillerRabin",
+            "ExtendedEuclideanAlgorithm",
+            "FastAdd",
+            "SumOfTwoSquares",
+            "ComputeOrderOfEllipticCurve"
+    })
     private String implName;
 
-    @Param({"256", "512", "1024"})
+    // @Param({"256", "512", "1024"})
+    @Param({"64"})
     private int bitSize;
 
     private BigInteger a;
@@ -51,11 +57,9 @@ public class AlgorithmBenchmark {
 
     @Benchmark
     public BigInteger messen(Counters counters) {
-        // Vorher Metriken erfassen
         long beforeHeap = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         double beforeCpu = osBean.getProcessCpuLoad() * 100.0;
 
-        // Algorithmus ausführen
         BigInteger result;
         switch (implName) {
             case "FastExponential":
@@ -64,11 +68,31 @@ public class AlgorithmBenchmark {
             case "EuclideanAlgorithm":
                 result = new EuclideanAlgorithm().execute(a, b);
                 break;
+            case "ExtendedEuclideanAlgorithm":
+                result = new ExtendedEuclideanAlgorithm().execute(a, b);
+                break;
+            case "MillerRabin":
+                result = new MillerRabin().execute(a);
+                break;
+            case "FastAdd":
+                result = new FastAdd().execute(a, b, BigInteger.valueOf(100), mod);
+                break;
+            case "SumOfTwoSquares":
+            case "ComputeOrderOfEllipticCurve":
+                BigInteger primeP = BigInteger.probablePrime(bitSize, random);
+                while (!primeP.mod(BigInteger.valueOf(4)).equals(BigInteger.ONE)) {
+                    primeP = BigInteger.probablePrime(bitSize, random);
+                }
+                if (implName.equals("SumOfTwoSquares")) {
+                    result = new SumOfTwoSquares().execute(primeP);
+                } else {
+                    result = new ComputeOrderOfEllipticCurve().execute(primeP);
+                }
+                break;
             default:
                 throw new IllegalStateException("Unbekannte Implementierung: " + implName);
         }
 
-        // Nachher Metriken erfassen
         long afterHeap = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         double afterCpu = osBean.getProcessCpuLoad() * 100.0;
 

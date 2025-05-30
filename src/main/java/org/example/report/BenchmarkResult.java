@@ -2,24 +2,45 @@ package org.example.report;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 /**
- * DTO für die Benchmark-Ergebnisse inkl. abgeleiteter Metriken.
+ * DTO für die Benchmark-Ergebnisse inkl. abgeleiteter Metriken und formatierter Strings.
  */
 public class BenchmarkResult {
+    private static final DecimalFormat formatter;
+
+    static {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMANY);
+        symbols.setDecimalSeparator(',');
+        symbols.setGroupingSeparator('.');
+        formatter = new DecimalFormat("#,##0.0000", symbols);
+    }
+
     private String name;
     private int bitSize;
-    private double score;           // ops/s
-    private double scoreError;      // ± ops/s
-    private Map<String, Double> scorePercentiles; // z.B. T50, T90
+    private double score;
+    private double scoreError;
+    private Map<String, Double> scorePercentiles;
 
-    // Abgeleitete Metriken
     private double opsPerMs;
     private double latencyUs;
+    private double heapMb;
+    private double cpuLoad;
 
-    // Neue Metriken
-    private double heapMb;     // Heap-Verbrauch in MB
-    private double cpuLoad;    // CPU-Auslastung in Prozent
+    // Formatierte Felder (für HTML-Ausgabe)
+    public String getFormattedScore() { return format(score); }
+    public String getFormattedScoreError() { return format(scoreError); }
+    public String getFormattedOpsPerMs() { return format(opsPerMs); }
+    public String getFormattedLatencyUs() { return format(latencyUs); }
+    public String getFormattedHeapMb() { return format(heapMb); }
+    public String getFormattedCpuLoad() { return format(cpuLoad); }
+
+    private String format(double value) {
+        return formatter.format(value);
+    }
 
     public BenchmarkResult() {
         scorePercentiles = new LinkedHashMap<>();

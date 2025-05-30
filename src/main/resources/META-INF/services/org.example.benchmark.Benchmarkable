@@ -1,2 +1,8 @@
+org.example.algorithmen.ComputeOrderOfEllipticCurve
 org.example.algorithmen.EuclideanAlgorithm
+org.example.algorithmen.ExtendedEuclideanAlgorithm
+org.example.algorithmen.FastAdd
 org.example.algorithmen.FastExponential
+org.example.algorithmen.MillerRabin
+org.example.algorithmen.SafePrimeNumber
+org.example.algorithmen.SumOfTwoSquares

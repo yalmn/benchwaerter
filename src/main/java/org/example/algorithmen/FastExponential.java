@@ -5,15 +5,16 @@ import org.example.benchmark.Benchmarkable;
 import java.math.BigInteger;
 
 public class FastExponential implements Benchmarkable {
+
     @Override
     public BigInteger execute(BigInteger... inputs) {
         if (inputs.length != 3) {
             throw new IllegalArgumentException("FastExponential erwartet drei Parameter: Basis, Exponent, Modulus");
         }
-        BigInteger base = inputs[0];
-        BigInteger exponent = inputs[1];
-        BigInteger mod = inputs[2];
+        return fastExponential(inputs[0], inputs[1], inputs[2]);
+    }
 
+    public static BigInteger fastExponential(BigInteger base, BigInteger exponent, BigInteger mod) {
         if (mod.signum() < 1) {
             throw new IllegalArgumentException("Modulus muss positiv sein.");
         }
