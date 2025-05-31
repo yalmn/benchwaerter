@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Crypto Benchmark Report</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+        }
+
+        .system-info {
+            background: #ecf0f1;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .system-info strong {
+            color: #2c3e50;
+        }
+
+        .summary {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-card {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+
+        .summary-card p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .compact-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 2rem 0 1rem 0;
+            font-size: 0.85rem;
+            color: #333;
+        }
+
+        .legend-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .legend-group strong {
+            width: 120px;
+            color: #2c3e50;
+        }
+
+        .legend-group span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-box {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #34495e;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .algorithm-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .metric-value {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+            font-size: 0.8rem;
+        }
+
+        /* Farbcodes */
+        .performance-high {
+            background-color: #d4edda !important;
+            color: #155724;
+        }
+
+        .performance-medium {
+            background-color: #fff3cd !important;
+            color: #856404;
+        }
+
+        .performance-low {
+            background-color: #f8d7da !important;
+            color: #721c24;
+        }
+
+        .latency-low {
+            background-color: #d4edda !important;
+            color: #155724;
+        }
+
+        .latency-medium {
+            background-color: #fff3cd !important;
+            color: #856404;
+        }
+
+        .latency-high {
+            background-color: #f8d7da !important;
+            color: #721c24;
+        }
+
+        .cpu-low {
+            background-color: #d4edda !important;
+            color: #155724;
+        }
+
+        .cpu-medium {
+            background-color: #fff3cd !important;
+            color: #856404;
+        }
+
+        .cpu-high {
+            background-color: #f8d7da !important;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Benchwaerter v1.0</h1>
+    <p class="subtitle">Erstellt am 31.05.2025 12:11:17</p>
+
+    <div class="system-info">
+        <strong>System:</strong> Mac OS X 15.4.1 (<span>x86_64</span>) |
+        <strong>Java:</strong> 23.0.2 |
+        <strong>CPU-Kerne:</strong> 12
+    </div>
+
+    <div class="summary">
+        <div class="summary-card">
+            <h3>8</h3>
+            <p>Algorithmen</p>
+        </div>
+        <div class="summary-card">
+            <h3><div> EuclideanAlgorithm | 32 Bit</div><div>84,52</div></h3>
+            <p>Beste Performance (ops/s)</p>
+        </div>
+    </div>
+
+    <!-- Kompakte farbliche Legende -->
+    <div class="compact-legend">
+        <div class="legend-group">
+            <strong>Durchsatz:</strong>
+            <span><span class="legend-box performance-high"></span> > 1000 ops/s</span>
+            <span><span class="legend-box performance-medium"></span> 100–1000 ops/s</span>
+            <span><span class="legend-box performance-low"></span> < 100 ops/s</span>
+        </div>
+        <div class="legend-group">
+            <strong>Latenz:</strong>
+            <span><span class="legend-box latency-low"></span> < 100 µs</span>
+            <span><span class="legend-box latency-medium"></span> 100–1000 µs</span>
+            <span><span class="legend-box latency-high"></span> > 1000 µs</span>
+        </div>
+        <div class="legend-group">
+            <strong>CPU-Last:</strong>
+            <span><span class="legend-box cpu-low"></span> < 30 %</span>
+            <span><span class="legend-box cpu-medium"></span> 30–70 %</span>
+            <span><span class="legend-box cpu-high"></span> > 70 %</span>
+        </div>
+    </div>
+
+    <!-- Benchmark-Tabelle -->
+    <table>
+        <thead>
+        <tr>
+            <th>Algorithmus</th>
+            <th>Bit-Größe</th>
+            <th>Durchsatz (ops/s)</th>
+            <th>Latenz (µs)</th>
+            <th>CPU-Last (%)</th>
+            <th>Messungen</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td colspan="6"><strong>* FastExponential</strong></td></tr>
+<tr><td class="algorithm-name">FastExponential</td><td>16 bit</td><td class="metric-value performance-low">80,34</td><td class="metric-value latency-high">12447,5</td><td class="metric-value cpu-high">171,3</td><td>1</td></tr>
+<tr><td class="algorithm-name">FastExponential</td><td>32 bit</td><td class="metric-value performance-low">83,65</td><td class="metric-value latency-high">11954,8</td><td class="metric-value cpu-high">97,6</td><td>1</td></tr>
+<tr><td class="algorithm-name">FastExponential</td><td>64 bit</td><td class="metric-value performance-low">83,09</td><td class="metric-value latency-high">12035,7</td><td class="metric-value cpu-high">173,6</td><td>1</td></tr>
+<tr><td colspan="6"><strong>* EuclideanAlgorithm</strong></td></tr>
+<tr><td class="algorithm-name">EuclideanAlgorithm</td><td>16 bit</td><td class="metric-value performance-low">79,77</td><td class="metric-value latency-high">12535,3</td><td class="metric-value cpu-medium">40,0</td><td>1</td></tr>
+<tr><td class="algorithm-name">EuclideanAlgorithm</td><td>32 bit</td><td class="metric-value performance-low">84,52</td><td class="metric-value latency-high">11832,0</td><td class="metric-value cpu-medium">31,2</td><td>1</td></tr>
+<tr><td class="algorithm-name">EuclideanAlgorithm</td><td>64 bit</td><td class="metric-value performance-low">81,14</td><td class="metric-value latency-high">12324,6</td><td class="metric-value cpu-high">116,5</td><td>1</td></tr>
+<tr><td colspan="6"><strong>* ExtendedEuclideanAlgorithm</strong></td></tr>
+<tr><td class="algorithm-name">ExtendedEuclideanAlgorithm</td><td>16 bit</td><td class="metric-value performance-low">82,17</td><td class="metric-value latency-high">12169,2</td><td class="metric-value cpu-medium">48,8</td><td>1</td></tr>
+<tr><td class="algorithm-name">ExtendedEuclideanAlgorithm</td><td>32 bit</td><td class="metric-value performance-low">83,45</td><td class="metric-value latency-high">11982,7</td><td class="metric-value cpu-high">102,1</td><td>1</td></tr>
+<tr><td class="algorithm-name">ExtendedEuclideanAlgorithm</td><td>64 bit</td><td class="metric-value performance-low">80,91</td><td class="metric-value latency-high">12359,1</td><td class="metric-value cpu-high">107,7</td><td>1</td></tr>
+<tr><td colspan="6"><strong>* MillerRabin</strong></td></tr>
+<tr><td class="algorithm-name">MillerRabin</td><td>16 bit</td><td class="metric-value performance-low">71,96</td><td class="metric-value latency-high">13896,8</td><td class="metric-value cpu-high">4904,9</td><td>1</td></tr>
+<tr><td class="algorithm-name">MillerRabin</td><td>32 bit</td><td class="metric-value performance-low">71,24</td><td class="metric-value latency-high">14036,7</td><td class="metric-value cpu-high">6642,6</td><td>1</td></tr>
+<tr><td class="algorithm-name">MillerRabin</td><td>64 bit</td><td class="metric-value performance-low">48,03</td><td class="metric-value latency-high">20820,4</td><td class="metric-value cpu-high">39691,9</td><td>1</td></tr>
+<tr><td colspan="6"><strong>* FastAdd</strong></td></tr>
+<tr><td class="algorithm-name">FastAdd</td><td>16 bit</td><td class="metric-value performance-low">77,46</td><td class="metric-value latency-high">12909,3</td><td class="metric-value cpu-high">116,9</td><td>1</td></tr>
+<tr><td class="algorithm-name">FastAdd</td><td>32 bit</td><td class="metric-value performance-low">83,23</td><td class="metric-value latency-high">12015,2</td><td class="metric-value cpu-high">74,8</td><td>1</td></tr>
+<tr><td class="algorithm-name">FastAdd</td><td>64 bit</td><td class="metric-value performance-low">82,49</td><td class="metric-value latency-high">12122,4</td><td class="metric-value cpu-high">89,1</td><td>1</td></tr>
+<tr><td colspan="6"><strong>* SumOfTwoSquares</strong></td></tr>
+<tr><td class="algorithm-name">SumOfTwoSquares</td><td>16 bit</td><td class="metric-value performance-low">72,37</td><td class="metric-value latency-high">13817,3</td><td class="metric-value cpu-high">4929,6</td><td>1</td></tr>
+<tr><td class="algorithm-name">SumOfTwoSquares</td><td>32 bit</td><td class="metric-value performance-low">73,68</td><td class="metric-value latency-high">13571,7</td><td class="metric-value cpu-high">6206,6</td><td>1</td></tr>
+<tr><td class="algorithm-name">SumOfTwoSquares</td><td>64 bit</td><td class="metric-value performance-low">49,71</td><td class="metric-value latency-high">20118,0</td><td class="metric-value cpu-high">34723,3</td><td>1</td></tr>
+<tr><td colspan="6"><strong>* ComputeOrderOfEllipticCurve</strong></td></tr>
+<tr><td class="algorithm-name">ComputeOrderOfEllipticCurve</td><td>16 bit</td><td class="metric-value performance-low">76,28</td><td class="metric-value latency-high">13109,8</td><td class="metric-value cpu-high">4142,8</td><td>1</td></tr>
+<tr><td class="algorithm-name">ComputeOrderOfEllipticCurve</td><td>32 bit</td><td class="metric-value performance-low">62,05</td><td class="metric-value latency-high">16116,0</td><td class="metric-value cpu-high">19830,8</td><td>1</td></tr>
+<tr><td class="algorithm-name">ComputeOrderOfEllipticCurve</td><td>64 bit</td><td class="metric-value performance-low">56,34</td><td class="metric-value latency-high">17748,0</td><td class="metric-value cpu-high">26228,9</td><td>1</td></tr>
+<tr><td colspan="6"><strong>* SafePrimeNumber</strong></td></tr>
+<tr><td class="algorithm-name">SafePrimeNumber</td><td>16 bit</td><td class="metric-value performance-low">74,69</td><td class="metric-value latency-high">13388,0</td><td class="metric-value cpu-high">3582,3</td><td>1</td></tr>
+<tr><td class="algorithm-name">SafePrimeNumber</td><td>32 bit</td><td class="metric-value performance-low">64,11</td><td class="metric-value latency-high">15598,9</td><td class="metric-value cpu-high">13495,1</td><td>1</td></tr>
+<tr><td class="algorithm-name">SafePrimeNumber</td><td>64 bit</td><td class="metric-value performance-low">45,14</td><td class="metric-value latency-high">22153,0</td><td class="metric-value cpu-high">34913,1</td><td>1</td></tr>
+<tr><td colspan="6">
+    <div class="legend">
+        <div class="legend-item"><strong>Algorithmus:</strong> Name des getesteten Algorithmus.</div>
+        <div class="legend-item"><strong>Bit-Größe:</strong> Länge der Eingabe (z. B. Schlüssellänge) in Bit.</div>
+        <div class="legend-item"><strong>Durchsatz (ops/s):</strong> Anzahl der Operationen pro Sekunde (höher = besser).</div>
+        <div class="legend-item"><strong>Latenz (µs):</strong> Zeit für eine einzelne Operation in Mikrosekunden (niedriger = besser).</div>
+        <div class="legend-item"><strong>CPU Load:</strong> Durchschnittliche CPU-Auslastung während der Benchmark-Ausführung in Prozent.</div>
+        <div class="legend-item"><strong>Messungen:</strong> Anzahl der durchgeführten Einzelmessungen.</div>
+    </div>
+</td></tr>
+
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p> https://github.com/yalmn | Benchwaerter Tool v1.0</p>
+    </div>
+</div>
+</body>
+</html>
