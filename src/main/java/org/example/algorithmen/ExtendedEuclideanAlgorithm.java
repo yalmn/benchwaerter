@@ -7,25 +7,13 @@ import java.math.BigInteger;
 public class ExtendedEuclideanAlgorithm implements Benchmarkable {
 
     @Override
-    public BigInteger execute(BigInteger... inputs) {
-        if (inputs.length != 2) {
-            throw new IllegalArgumentException("ExtendedEuclideanAlgorithm erwartet zwei Parameter: a und b");
-        }
-
-        BigInteger a = inputs[0];
-        BigInteger b = inputs[1];
-
-        BigInteger[] result = extendedGCD(a, b);
-
-        return result[0];
+    public BigInteger execute(BigInteger... params) {
+        BigInteger a = params[0];
+        BigInteger b = params[1];
+        return extendedGCD(a, b)[0]; // Nur ggT als Benchmark-Rückgabe
     }
 
-    @Override
-    public String name() {
-        return "ExtendedEuclideanAlgorithm";
-    }
-
-    private static BigInteger[] extendedGCD(BigInteger a, BigInteger b) {
+    public static BigInteger[] extendedGCD(BigInteger a, BigInteger b) {
         BigInteger x0 = BigInteger.ONE, y0 = BigInteger.ZERO;
         BigInteger x1 = BigInteger.ZERO, y1 = BigInteger.ONE;
 
@@ -45,6 +33,6 @@ public class ExtendedEuclideanAlgorithm implements Benchmarkable {
             y1 = tempY;
         }
 
-        return new BigInteger[]{a, x0, y0};
+        return new BigInteger[]{ a, x0, y0 };
     }
 }

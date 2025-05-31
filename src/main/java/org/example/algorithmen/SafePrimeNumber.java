@@ -7,22 +7,16 @@ import java.security.SecureRandom;
 
 public class SafePrimeNumber implements Benchmarkable {
 
-    private final FastExponential expAlgo = new FastExponential();
-
     @Override
-    public BigInteger execute(BigInteger... inputs) {
-        int bitLength = (inputs.length > 0) ? inputs[0].intValue() : 512;
-        int iterations = (inputs.length > 1) ? inputs[1].intValue() : 5;
+    public BigInteger execute(BigInteger... params) {
+        int bitLength = params[0].intValue();
+        int iterations = 100; // fest für Benchmark
 
-        return generateSafePrime(bitLength, iterations);
+        BigInteger[] result = safePrimeNumber(bitLength, iterations);
+        return result[0]; // Rückgabe nur der Safe Prime
     }
 
-    @Override
-    public String name() {
-        return "SafePrimeNumber";
-    }
-
-    private BigInteger generateSafePrime(int bitLength, int iterations) {
+    public static BigInteger[] safePrimeNumber(int bitLength, int iterations) {
         SecureRandom secureRandom = new SecureRandom();
         BigInteger two = BigInteger.TWO;
 
@@ -33,20 +27,18 @@ public class SafePrimeNumber implements Benchmarkable {
             if (MillerRabin.millerRabin(p, iterations)) {
                 BigInteger g = findPrimitiveRoot(p, q, bitLength, secureRandom);
                 if (g != null) {
-                    return p;
+                    return new BigInteger[] { p, g };
                 }
             }
         }
     }
 
-    private BigInteger findPrimitiveRoot(BigInteger p, BigInteger q, int bitLength, SecureRandom random) {
+    private static BigInteger findPrimitiveRoot(BigInteger p, BigInteger q, int bitLength, SecureRandom random) {
+        BigInteger g;
         for (int i = 0; i < 100; i++) {
-            BigInteger g = new BigInteger(bitLength, random).mod(p);
-            if (!g.equals(BigInteger.ZERO)) {
-                BigInteger result = expAlgo.execute(g, q, p);
-                if (result.equals(p.subtract(BigInteger.ONE))) {
-                    return g;
-                }
+            g = new BigInteger(bitLength, random).mod(p);
+            if (!g.equals(BigInteger.ZERO) && FastExponential.fastExponential(g, q, p).equals(p.subtract(BigInteger.ONE))) {
+                return g;
             }
         }
         return null;

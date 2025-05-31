@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Crypto Benchmark Report</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+        }
+
+        .system-info {
+            background: #ecf0f1;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .system-info strong {
+            color: #2c3e50;
+        }
+
+        .summary {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-card {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+
+        .summary-card p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .compact-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 2rem 0 1rem 0;
+            font-size: 0.85rem;
+            color: #333;
+        }
+
+        .legend-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .legend-group strong {
+            width: 120px;
+            color: #2c3e50;
+        }
+
+        .legend-group span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-box {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #34495e;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .algorithm-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .metric-value {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+            font-size: 0.8rem;
+        }
+
+        /* Farbcodes */
+        .performance-high {
+            background-color: #d4edda !important;
+            color: #155724;
+        }
+
+        .performance-medium {
+            background-color: #fff3cd !important;
+            color: #856404;
+        }
+
+        .performance-low {
+            background-color: #f8d7da !important;
+            color: #721c24;
+        }
+
+        .latency-low {
+            background-color: #d4edda !important;
+            color: #155724;
+        }
+
+        .latency-medium {
+            background-color: #fff3cd !important;
+            color: #856404;
+        }
+
+        .latency-high {
+            background-color: #f8d7da !important;
+            color: #721c24;
+        }
+
+        .cpu-low {
+            background-color: #d4edda !important;
+            color: #155724;
+        }
+
+        .cpu-medium {
+            background-color: #fff3cd !important;
+            color: #856404;
+        }
+
+        .cpu-high {
+            background-color: #f8d7da !important;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Benchwaerter v1.0</h1>
+    <p class="subtitle">Erstellt am <!-- TIMESTAMP --></p>
+
+    <div class="system-info">
+        <strong>System:</strong> <!-- OS --> (<span><!-- ARCH --></span>) |
+        <strong>Java:</strong> <!-- JAVA --> |
+        <strong>CPU-Kerne:</strong> <!-- CORES -->
+    </div>
+
+    <div class="summary">
+        <div class="summary-card">
+            <h3><!-- TOTAL_ALGORITHMS --></h3>
+            <p>Algorithmen</p>
+        </div>
+        <div class="summary-card">
+            <h3><!-- MAX_THROUGHPUT --></h3>
+            <p>Beste Performance (ops/s)</p>
+        </div>
+    </div>
+
+    <!-- Kompakte farbliche Legende -->
+    <div class="compact-legend">
+        <div class="legend-group">
+            <strong>Durchsatz:</strong>
+            <span><span class="legend-box performance-high"></span> > 1000 ops/s</span>
+            <span><span class="legend-box performance-medium"></span> 100–1000 ops/s</span>
+            <span><span class="legend-box performance-low"></span> < 100 ops/s</span>
+        </div>
+        <div class="legend-group">
+            <strong>Latenz:</strong>
+            <span><span class="legend-box latency-low"></span> < 100 µs</span>
+            <span><span class="legend-box latency-medium"></span> 100–1000 µs</span>
+            <span><span class="legend-box latency-high"></span> > 1000 µs</span>
+        </div>
+        <div class="legend-group">
+            <strong>CPU-Last:</strong>
+            <span><span class="legend-box cpu-low"></span> < 30 %</span>
+            <span><span class="legend-box cpu-medium"></span> 30–70 %</span>
+            <span><span class="legend-box cpu-high"></span> > 70 %</span>
+        </div>
+    </div>
+
+    <!-- Benchmark-Tabelle -->
+    <table>
+        <thead>
+        <tr>
+            <th>Algorithmus</th>
+            <th>Bit-Größe</th>
+            <th>Durchsatz (ops/s)</th>
+            <th>Latenz (µs)</th>
+            <th>CPU-Last (%)</th>
+            <th>Messungen</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- BENCHMARK_ROWS -->
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p> https://github.com/yalmn | Benchwaerter Tool v1.0</p>
+    </div>
+</div>
+</body>
+</html>

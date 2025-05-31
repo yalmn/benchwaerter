@@ -12,11 +12,12 @@ mvn clean package -q
 # Pfade
 JAR_PATH="target/benchwaerter-1.0-SNAPSHOT.jar"
 JSON_RESULTS="benchmark-results.json"
-HTML_REPORT="report.html"
+HTML_REPORT="benchmark-report.html"
+TEMPLATE_PATH="src/main/resources/templates/report-template.html"
 
 # 2. Benchmarks ausführen
 echo ">>> Führe Benchmarks aus (JMH)..."
-java -jar "$JAR_PATH"
+java -jar "$JAR_PATH" > "$JSON_RESULTS"
 
 # Prüfen, ob JSON-Datei existiert
 if [[ ! -f "$JSON_RESULTS" ]]; then
@@ -26,16 +27,16 @@ fi
 
 # 3. Report generieren
 echo ">>> Erzeuge HTML-Report..."
-java -cp target/classes:"$JAR_PATH" org.example.report.ReportGenerator
+java -cp "target/classes:$JAR_PATH" org.example.report.ReportGenerator "$JSON_RESULTS" "$TEMPLATE_PATH" "$HTML_REPORT"
 
 # Prüfen, ob Report existiert
 if [[ ! -f "$HTML_REPORT" ]]; then
-  echo "Fehler: '$HTML_REPORT' wurde nicht gefunden." >&2
+  echo "Fehler: '$HTML_REPORT' wurde nicht erstellt." >&2
   exit 1
 fi
 
 # 4. Erfolgsmeldung
-echo "
-Benchmark und Report erfolgreich abgeschlossen."
+echo
+echo "Benchmark und Report erfolgreich abgeschlossen."
 echo "- Ergebnisse: $JSON_RESULTS"
 echo "- HTML-Report: $HTML_REPORT"
