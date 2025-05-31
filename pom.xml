@@ -39,6 +39,19 @@
             <version>${jackson.version}</version>
         </dependency>
 
+        <!-- Einfache SLF4J-Logger-Implementierung -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+
         <!-- Thymeleaf für HTML-Templates -->
         <dependency>
             <groupId>org.thymeleaf</groupId>

@@ -1,100 +1,145 @@
 package org.example.report;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import com.google.gson.*;
+import java.io.IOException;
+import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-/**
- * Liest das JMH-JSON (benchmark-results.json) ein, berechnet abgeleitete Metriken
- * inklusive Heap-Verbrauch und CPU-Auslastung, und erzeugt einen HTML-Report.
- */
 public class ReportGenerator {
 
-    public static void main(String[] args) throws Exception {
-        String jmhJson = "benchmark-results.json";
-        String outHtml = "report.html";
+    public static void generateReport(String jsonPath, String templatePath, String outputPath) throws IOException {
+        // JSON und Template einlesen
+        String jsonContent = Files.readString(Paths.get(jsonPath));
+        JsonArray benchmarks = JsonParser.parseString(jsonContent).getAsJsonArray();
+        String template = Files.readString(Paths.get(templatePath));
 
-        // JSON einlesen
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(new File(jmhJson));
+        StringBuilder rows = new StringBuilder();
+        double maxThroughput = 0;
+        String maxAlgoName = "";
+        String maxBitSize = "";
+        Set<String> uniqueAlgos = new HashSet<>();
 
-        List<BenchmarkResult> results = new ArrayList<>();
-        Iterator<JsonNode> nodes;
-        if (root.isArray()) {
-            nodes = root.elements();
-        } else if (root.has("benchmarks")) {
-            nodes = root.get("benchmarks").elements();
-        } else {
-            throw new IllegalStateException("Unbekanntes JSON-Format: Weder Array noch 'benchmarks'-Feld vorhanden.");
+        // Gruppierung nach Algorithmusnamen
+        Map<String, List<JsonObject>> grouped = new LinkedHashMap<>();
+        for (JsonElement elem : benchmarks) {
+            JsonObject obj = elem.getAsJsonObject();
+            JsonObject params = obj.getAsJsonObject("params");
+            String algo = params.get("implName").getAsString();
+            grouped.computeIfAbsent(algo, k -> new ArrayList<>()).add(obj);
+            uniqueAlgos.add(algo);
         }
 
-        while (nodes.hasNext()) {
-            JsonNode node = nodes.next();
-            BenchmarkResult br = new BenchmarkResult();
+        // Gruppierte Ausgabe pro Algorithmus
+        for (String algo : grouped.keySet()) {
+            rows.append("<tr><td colspan=\"6\"><strong>* ").append(algo).append("</strong></td></tr>\n");
 
-            // Parameter
-            JsonNode params = node.get("params");
-            br.setName(params.get("implName").asText());
-            br.setBitSize(params.get("bitSize").asInt());
+            for (JsonObject obj : grouped.get(algo)) {
+                JsonObject params = obj.getAsJsonObject("params");
+                JsonObject primary = obj.getAsJsonObject("primaryMetric");
+                JsonObject secondary = obj.getAsJsonObject("secondaryMetrics");
 
-            // Score und Fehler
-            JsonNode pm = node.get("primaryMetric");
-            double score = pm.get("score").asDouble();
-            br.setScore(score);
-            br.setScoreError(pm.get("scoreError").asDouble());
+                String bit = params.get("bitSize").getAsString();
+                double throughput = primary.get("score").getAsDouble();
+                JsonElement itersElem = primary.get("measuredIterations");
+                int measurements = (itersElem != null && !itersElem.isJsonNull()) ? itersElem.getAsInt() : 1;
+                double latencyUs = 1_000_000.0 / throughput;
 
-            // Abgeleitet
-            br.setOpsPerMs(score / 1000.0);
-            br.setLatencyUs(1_000_000.0 / score);
-
-            // Sekundäre Metriken
-            JsonNode secondary = node.get("secondaryMetrics");
-            if (secondary != null) {
-                JsonNode heapNode = secondary.get("heapBytes");
-                if (heapNode != null && heapNode.has("score")) {
-                    br.setHeapMb(heapNode.get("score").asDouble() / (1024.0 * 1024.0));
+                double cpu = 0.0;
+                if (secondary.has("cpuLoad")) {
+                    cpu = secondary.getAsJsonObject("cpuLoad").get("score").getAsDouble();
                 }
-                JsonNode cpuNode = secondary.get("cpuLoad");
-                if (cpuNode != null && cpuNode.has("score")) {
-                    br.setCpuLoad(cpuNode.get("score").asDouble());
+
+                if (throughput > maxThroughput) {
+                    maxThroughput = throughput;
+                    maxAlgoName = algo;
+                    maxBitSize = bit;
                 }
+
+                String perfClass = classifyPerformance(throughput);
+                String latencyClass = classifyLatency(latencyUs);
+                String cpuClass = classifyCpu(cpu);
+
+                rows.append("<tr>")
+                        .append("<td class=\"algorithm-name\">").append(algo).append("</td>")
+                        .append("<td>").append(bit).append(" bit</td>")
+                        .append("<td class=\"metric-value ").append(perfClass).append("\">")
+                        .append(String.format("%.2f", throughput)).append("</td>")
+                        .append("<td class=\"metric-value ").append(latencyClass).append("\">")
+                        .append(String.format("%.1f", latencyUs)).append("</td>")
+                        .append("<td class=\"metric-value ").append(cpuClass).append("\">")
+                        .append(String.format("%.1f", cpu)).append("</td>")
+                        .append("<td>").append(measurements).append("</td>")
+                        .append("</tr>\n");
             }
-
-            results.add(br);
         }
 
-        // Thymeleaf konfigurieren
-        ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
-        resolver.setPrefix("/templates/");
-        resolver.setSuffix(".html");
-        resolver.setCharacterEncoding("UTF-8");
-        resolver.setTemplateMode("HTML");
-        resolver.setCacheable(false);
-        TemplateEngine engine = new TemplateEngine();
-        engine.setTemplateResolver(resolver);
+        // Metrik-Legende anhängen
+        String rowsAndLegend = rows + """
+            <tr><td colspan="6">
+                <div class="legend">
+                    <div class="legend-item"><strong>Algorithmus:</strong> Name des getesteten Algorithmus.</div>
+                    <div class="legend-item"><strong>Bit-Größe:</strong> Länge der Eingabe (z. B. Schlüssellänge) in Bit.</div>
+                    <div class="legend-item"><strong>Durchsatz (ops/s):</strong> Anzahl der Operationen pro Sekunde (höher = besser).</div>
+                    <div class="legend-item"><strong>Latenz (µs):</strong> Zeit für eine einzelne Operation in Mikrosekunden (niedriger = besser).</div>
+                    <div class="legend-item"><strong>CPU Load:</strong> Durchschnittliche CPU-Auslastung während der Benchmark-Ausführung in Prozent.</div>
+                    <div class="legend-item"><strong>Messungen:</strong> Anzahl der durchgeführten Einzelmessungen.</div>
+                </div>
+            </td></tr>
+            """;
 
-        // Kontext befüllen
-        Context context = new Context();
-        context.setVariable("results", results);
-        context.setVariable("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")));
-        context.setVariable("architecture", System.getProperty("os.arch"));
-        context.setVariable("osName", System.getProperty("os.name") + " " + System.getProperty("os.version"));
+        // Systeminfos und Zeitstempel
+        String os = System.getProperty("os.name") + " " + System.getProperty("os.version");
+        String arch = System.getProperty("os.arch");
+        String java = System.getProperty("java.version");
+        int cores = Runtime.getRuntime().availableProcessors();
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
 
-        // Rendern
-        String html = engine.process("report", context);
-        Files.write(Paths.get(outHtml), html.getBytes("UTF-8"));
+        // Template-Platzhalter ersetzen
+        String result = template
+                .replace("<!-- TIMESTAMP -->", timestamp)
+                .replace("<!-- OS -->", os)
+                .replace("<!-- ARCH -->", arch)
+                .replace("<!-- JAVA -->", java)
+                .replace("<!-- CORES -->", String.valueOf(cores))
+                .replace("<!-- TOTAL_ALGORITHMS -->", String.valueOf(uniqueAlgos.size()))
+                .replace("<!-- MAX_THROUGHPUT -->", String.format("<div> %s | %s Bit</div><div>%.2f</div>", maxAlgoName, maxBitSize, maxThroughput))
+                .replace("<!-- BENCHMARK_ROWS -->", rowsAndLegend);
 
-        System.out.println("Report erstellt: " + outHtml);
+        // HTML schreiben
+        Files.writeString(Paths.get(outputPath), result);
+        System.out.println(" HTML-Report erfolgreich erstellt unter: " + outputPath);
+    }
+
+    // Klassifizierungen
+    private static String classifyPerformance(double throughput) {
+        if (throughput > 1000) return "performance-high";
+        if (throughput > 100) return "performance-medium";
+        return "performance-low";
+    }
+
+    private static String classifyLatency(double latencyUs) {
+        if (latencyUs < 100) return "latency-low";
+        if (latencyUs < 1000) return "latency-medium";
+        return "latency-high";
+    }
+
+    private static String classifyCpu(double cpu) {
+        if (cpu < 30) return "cpu-low";
+        if (cpu < 70) return "cpu-medium";
+        return "cpu-high";
+    }
+
+    public static void main(String[] args) {
+        try {
+            generateReport(
+                    "benchmark-results.json",
+                    "src/main/resources/templates/report-template.html",
+                    "benchmark-report.html"
+            );
+        } catch (IOException e) {
+            System.err.println(" Fehler beim Erstellen des Reports: " + e.getMessage());
+        }
     }
 }
